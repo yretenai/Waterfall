@@ -1,0 +1,20 @@
+--- Makefile.old	2024-11-28 22:08:53.699705319 +0000
++++ Makefile	2024-11-28 22:08:05.498934021 +0000
+@@ -37,7 +37,7 @@
+ UPDATE_SUBMODULES := $(shell git submodule update --init --recursive)
+ 
+ TARGET = libdensity
+-CFLAGS = -Ofast -flto -std=c99 -Wall
++CFLAGS = -Ofast -flto -std=c99 -Wall -static-libgcc -static-libstdc++ -D_WIN64 -D_WIN32
+ LFLAGS = -flto
+ 
+ BUILD_DIRECTORY = build
+@@ -124,7 +124,7 @@
+ 
+ link: pre-link $(DENSITY_OBJ)
+ 	$(AR) crs $(BUILD_DIRECTORY)/$(TARGET)$(STATIC_EXTENSION) $(DENSITY_OBJ)
+-	$(CC) $(LFLAGS) -shared -o $(BUILD_DIRECTORY)/$(TARGET)$(EXTENSION) $(BUILD_DIRECTORY)/$(TARGET)$(STATIC_EXTENSION)
++	$(CC) $(LFLAGS) -shared -o $(BUILD_DIRECTORY)/$(TARGET)$(EXTENSION) $(DENSITY_OBJ)
+ 
+ post-link: link
+ 	@echo Done.
