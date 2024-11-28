@@ -8,6 +8,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<None Update="runtimes\win-x64\native\libdensity.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 		<None Update="runtimes\win-x64\native\libchm.dll">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>

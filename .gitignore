@@ -332,4 +332,6 @@ ASALocalRun/
 nuget.config
 *.patch
 
-runtimes
+**/*lzo*
+**/*zstd*
+**/*oo2core*
