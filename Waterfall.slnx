@@ -1,0 +1,4 @@
+<Solution>
+    <Project Path="Waterfall\Waterfall.csproj" Type="Classic C#" />
+    <Project Path="Waterfall.Tests\Waterfall.Tests.csproj" Type="Classic C#" />
+</Solution>

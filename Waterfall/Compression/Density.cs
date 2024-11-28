@@ -1,7 +1,3 @@
-using System;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-
 namespace Waterfall.Compression;
 
 public static partial class Density {
@@ -17,9 +13,7 @@ public static partial class Density {
 	}
 
 	private static partial class NativeMethods {
-		private const string LIBRARY_NAME = "density";
-
-		[LibraryImport(LIBRARY_NAME), DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories), UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		[LibraryImport(CompressionHelper.DensityLibraryName), DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories), UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
 		public static unsafe partial int density_decompress(byte* src, int srcLen, byte* dst, int dstLen);
 	}
 }

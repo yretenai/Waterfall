@@ -1,20 +1,23 @@
-using System;
-using System.Buffers;
 using System.IO;
 using System.IO.Compression;
-using System.Reflection;
-using System.Runtime.InteropServices;
 using K4os.Compression.LZ4;
 using SevenZip.Compression.LZMA;
 
 namespace Waterfall.Compression;
 
 public static class CompressionHelper {
-	public static bool EnableLogging { get; set; } = false;
+	// could use mspack, but we'd have to implement our own io handlers.
+	internal const string LzxLibraryName = "chm";
+	internal const string LzoLibraryName = "lzo2";
+	internal const string OodleLibraryName = "oo2core";
+	internal const string ZstdLibraryName = "zstd";
+	internal const string DensityLibraryName = "density";
 
 	static CompressionHelper() {
 		NativeLibrary.SetDllImportResolver(Assembly.GetExecutingAssembly(), DllImportResolver);
 	}
+
+	public static bool EnableLogging { get; set; } = false;
 
 	internal static IntPtr DllImportResolver(string libraryName, Assembly assembly, DllImportSearchPath? searchPath) {
 		if (NativeLibrary.TryLoad(libraryName, assembly, searchPath, out var handle)) {
@@ -47,6 +50,30 @@ public static class CompressionHelper {
 		}
 
 		return IntPtr.Zero;
+	}
+
+	internal static bool CanLoadLibrary(string libraryName) => NativeLibrary.TryLoad(libraryName, out _);
+
+	public static bool IsSupported(CompressionType compressionType) {
+		return compressionType switch {
+			       CompressionType.None => true,
+			       CompressionType.Oodle => CanLoadLibrary(OodleLibraryName),
+			       CompressionType.Brotli => true,
+			       CompressionType.Zlib => true,
+			       CompressionType.Deflate => true,
+			       CompressionType.Gzip => true,
+			       CompressionType.LZ4 => true,
+			       CompressionType.LZ4HC => true,
+			       CompressionType.LZO1 => CanLoadLibrary(LzoLibraryName),
+			       CompressionType.LZO2 => CanLoadLibrary(LzoLibraryName),
+			       CompressionType.LZX => CanLoadLibrary(LzxLibraryName),
+			       CompressionType.LZMA => true,
+			       CompressionType.SafeLZMA => true,
+			       CompressionType.RawLZMA => true,
+			       CompressionType.Zstd => CanLoadLibrary(ZstdLibraryName),
+			       CompressionType.Density => CanLoadLibrary(DensityLibraryName),
+			       _ => false,
+		       };
 	}
 
 
@@ -145,6 +172,7 @@ public static class CompressionHelper {
 							inStream.Position += 8;
 							break;
 					}
+
 					coder.Code(inStream, outStream, inStream.Length - inStream.Position, outStream.Length, null);
 				} finally {
 					ArrayPool<byte>.Shared.Return(array);

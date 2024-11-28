@@ -17,5 +17,4 @@ public enum CompressionType {
 	RawLZMA,
 	Zstd,
 	Density,
-	Custom = -1,
 }
