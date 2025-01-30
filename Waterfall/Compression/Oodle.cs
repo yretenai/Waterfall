@@ -173,12 +173,8 @@ public static partial class Oodle {
 		}
 	}
 
-	public static unsafe int Compress(Memory<byte> input, Memory<byte> output) {
-		using var inPin = input.Pin();
-		using var outPin = output.Pin();
-		using var pool = MemoryPool<byte>.Shared.Rent(BlockDecoderMemorySizeNeeded);
-		using var poolPin = pool.Memory.Pin();
-		return NativeMethods.OodleLZ_Decompress((byte*) inPin.Pointer, input.Length, (byte*) outPin.Pointer, output.Length, true, false, OodleLZ_Verbosity.Minimal, null, 0, null, null, (byte*) poolPin.Pointer, BlockDecoderMemorySizeNeeded, OodleLZ_Decode_ThreadPhase.Unthreaded);
+	public static int Compress(Memory<byte> input, Memory<byte> output) {
+		return Compress(input, output, Memory<byte>.Empty, OodleLZ_Compressor.Hydra, OodleLZ_CompressionLevel.HyperFast4, GetDefaultOptions(OodleLZ_Compressor.Hydra, OodleLZ_CompressionLevel.HyperFast4));
 	}
 
 	private static unsafe OodleLZ_CompressOptions GetDefaultOptions(OodleLZ_Compressor compressor, OodleLZ_CompressionLevel level) {

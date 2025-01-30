@@ -76,28 +76,24 @@ public static class CompressionHelper {
 		       };
 	}
 
-
-	public static unsafe void Decompress(CompressionType type, Memory<byte> compressed, Memory<byte> decompressed) {
+	public static unsafe int Decompress(CompressionType type, Memory<byte> compressed, Memory<byte> decompressed) {
 		switch (type) {
 			case CompressionType.Zlib: {
 				using var dataPin = compressed.Pin();
 				using var dataStream = new UnmanagedMemoryStream((byte*) dataPin.Pointer, compressed.Length);
-				try {
-					using var zlib = new ZLibStream(dataStream, CompressionMode.Decompress);
-					zlib.ReadExactly(decompressed.Span);
-				} catch (Exception e) {
-					throw new InvalidOperationException("decompression failed", e);
-				}
+				using var zlib = new ZLibStream(dataStream, CompressionMode.Decompress);
+				zlib.ReadExactly(decompressed.Span);
 
-				break;
+				return decompressed.Length;
 			}
 			case CompressionType.Zstd: {
 				using var zstd = new ZStandard();
-				if (zstd.Decompress(compressed, decompressed) < 0) {
+				var n = zstd.Decompress(compressed, decompressed);
+				if (n < 0) {
 					throw new InvalidOperationException("decompression failed");
 				}
 
-				break;
+				return n;
 			}
 			case CompressionType.Gzip: {
 				using var dataPin = compressed.Pin();
@@ -106,22 +102,24 @@ public static class CompressionHelper {
 				using var zlib = new GZipStream(dataStream, CompressionMode.Decompress);
 				zlib.ReadExactly(decompressed.Span);
 
-				break;
+				return decompressed.Length;
 			}
 			case CompressionType.Oodle: {
-				if (Oodle.Decompress(compressed, decompressed) < 0) {
+				var n = Oodle.Decompress(compressed, decompressed);
+				if (n < 0) {
 					throw new InvalidOperationException("decompression failed");
 				}
 
-				break;
+				return n;
 			}
 			case CompressionType.LZ4:
 			case CompressionType.LZ4HC: {
-				if (LZ4Codec.Decode(compressed.Span, decompressed.Span) == -1) {
+				var n = LZ4Codec.Decode(compressed.Span, decompressed.Span);
+				if (n == -1) {
 					throw new InvalidOperationException("decompression failed");
 				}
 
-				break;
+				return n;
 			}
 			case CompressionType.Brotli: {
 				using var dataPin = compressed.Pin();
@@ -129,28 +127,32 @@ public static class CompressionHelper {
 				using var brotli = new BrotliStream(dataStream, CompressionMode.Decompress);
 				brotli.ReadExactly(decompressed.Span);
 
-				break;
+				return decompressed.Length;
 			}
 			case CompressionType.LZO1: {
-				if (LZO.DecompressLzo1(compressed, decompressed) < 0) {
+				var n = LZO.DecompressLzo1(compressed, decompressed);
+				if (n < 0) {
 					throw new InvalidOperationException("decompression failed");
 				}
 
-				break;
+				return n;
 			}
 			case CompressionType.LZO2: {
-				if (LZO.DecompressLzo2(compressed, decompressed) < 0) {
+				var n = LZO.DecompressLzo2(compressed, decompressed);
+				if (n < 0) {
 					throw new InvalidOperationException("decompression failed");
 				}
 
-				break;
+				return n;
 			}
-			case CompressionType.LZX:
-				if (LZX.Decompress(compressed, decompressed, 17) < 0) {
+			case CompressionType.LZX: {
+				var n = LZX.Decompress(compressed, decompressed, 17);
+				if (n < 0) {
 					throw new InvalidOperationException("decompression failed");
 				}
 
-				break;
+				return n;
+			}
 			case CompressionType.LZMA:
 			case CompressionType.SafeLZMA:
 			case CompressionType.RawLZMA: {
@@ -178,18 +180,83 @@ public static class CompressionHelper {
 					ArrayPool<byte>.Shared.Return(array);
 				}
 
-				break;
+				return decompressed.Length;
 			}
 			case CompressionType.Density: {
-				if (Density.Decompress(compressed, decompressed) < 0) {
+				var n = Density.Decompress(compressed, decompressed);
+				if (n < 0) {
 					throw new InvalidOperationException("decompression failed");
 				}
 
-				break;
+				return n;
 			}
 			case CompressionType.None:
 				compressed.CopyTo(decompressed);
-				break;
+				return decompressed.Length;
+			default:
+				throw new NotSupportedException("Compression type is not supported");
+		}
+	}
+
+	public static unsafe int Compress(CompressionType type, Memory<byte> compressed, Memory<byte> decompressed) {
+		switch (type) {
+			case CompressionType.Zlib: {
+				using var dataPin = compressed.Pin();
+				using var dataStream = new UnmanagedMemoryStream((byte*) dataPin.Pointer, compressed.Length);
+				using var zlib = new ZLibStream(dataStream, CompressionMode.Compress);
+				zlib.Write(decompressed.Span);
+				zlib.Flush();
+
+				return (int) zlib.Position;
+			}
+			case CompressionType.Zstd: {
+				using var zstd = new ZStandard();
+				var n = (int) zstd.Compress(decompressed, compressed, ZSTDCompressionLevel.DecompressFast);
+				if (n < 0) {
+					throw new InvalidOperationException("compression failed");
+				}
+
+				return n;
+			}
+			case CompressionType.Gzip: {
+				using var dataPin = compressed.Pin();
+				using var dataStream = new UnmanagedMemoryStream((byte*) dataPin.Pointer, compressed.Length);
+				dataStream.Position = 2;
+				using var zlib = new GZipStream(dataStream, CompressionMode.Compress);
+				zlib.Write(decompressed.Span);
+				zlib.Flush();
+
+				return (int) zlib.Position;
+			}
+			case CompressionType.Oodle: {
+				var n = Oodle.Compress(decompressed, compressed);
+				if (n < 0) {
+					throw new InvalidOperationException("compression failed");
+				}
+
+				return n;
+			}
+			case CompressionType.LZ4:
+			case CompressionType.LZ4HC: {
+				var n = LZ4Codec.Encode(decompressed.Span, compressed.Span);
+				if (n == -1) {
+					throw new InvalidOperationException("compression failed");
+				}
+
+				return n;
+			}
+			case CompressionType.Brotli: {
+				using var dataPin = compressed.Pin();
+				using var dataStream = new UnmanagedMemoryStream((byte*) dataPin.Pointer, compressed.Length);
+				using var brotli = new BrotliStream(dataStream, CompressionMode.Compress);
+				brotli.Write(decompressed.Span);
+				brotli.Flush();
+
+				return (int) brotli.Position;
+			}
+			case CompressionType.None:
+				compressed.CopyTo(decompressed);
+				return compressed.Length;
 			default:
 				throw new NotSupportedException("Compression type is not supported");
 		}
