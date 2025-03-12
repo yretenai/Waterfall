@@ -24,28 +24,29 @@ public static class CompressionHelper {
 			return handle;
 		}
 
+		var name = Path.GetFileNameWithoutExtension(libraryName);
 		var cwd = AppDomain.CurrentDomain.BaseDirectory;
-		var target = Path.Combine(cwd, $"runtimes/{RuntimeInformation.RuntimeIdentifier}/native/{libraryName}");
 
+		string ext;
 		if (OperatingSystem.IsWindows()) {
-			target += ".dll";
+			ext = ".dll";
 		} else if (OperatingSystem.IsLinux()) {
-			target += ".so";
+			ext = ".so";
 		} else if (OperatingSystem.IsMacOS()) {
-			target += ".dylib";
+			ext = ".dylib";
 		} else {
 			return nint.Zero;
 		}
 
-		if (File.Exists(target)) {
-			return NativeLibrary.Load(target);
-		}
-
-		if (!libraryName.StartsWith("lib")) {
-			var prefixedName = Path.Combine(Path.GetDirectoryName(target)!, "lib" + Path.GetFileName(target));
-
-			if (File.Exists(prefixedName)) {
-				return NativeLibrary.Load(prefixedName);
+		foreach (var dir in new[] { Path.Combine(cwd, $"runtimes/{RuntimeInformation.RuntimeIdentifier}/native/"), cwd }) {
+			foreach (var libName in new[] { name, "lib" + name, name + "-0", $"lib{name}-0" }) {
+				var target = Path.Combine(dir, libName) + ext;
+				if (File.Exists(target)) {
+					var ptr = NativeLibrary.Load(target);
+					if (ptr != nint.Zero) {
+						return ptr;
+					}
+				}
 			}
 		}
 
