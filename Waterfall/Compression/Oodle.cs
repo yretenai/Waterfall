@@ -71,7 +71,7 @@ public static partial class Oodle {
 		if (CompressionHelper.EnableLogging) {
 			// not as a dllimport because these may not exist.
 			var handle = CompressionHelper.DllImportResolver(CompressionHelper.OodleLibraryName, Assembly.GetExecutingAssembly(), DllImportSearchPath.SafeDirectories);
-			if (handle != IntPtr.Zero) {
+			if (handle != nint.Zero) {
 				if (NativeLibrary.TryGetExport(handle, "OodleCore_Plugin_Printf_Verbose", out var callbackAddress)) {
 					var callback = Marshal.GetDelegateForFunctionPointer<NativeMethods.OodleCore_Plugin_Printf>(callbackAddress);
 					NativeMethods.OodleCore_Plugins_SetPrintf(callback);

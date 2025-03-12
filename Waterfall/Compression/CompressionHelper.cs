@@ -19,7 +19,7 @@ public static class CompressionHelper {
 
 	public static bool EnableLogging { get; set; } = false;
 
-	internal static IntPtr DllImportResolver(string libraryName, Assembly assembly, DllImportSearchPath? searchPath) {
+	internal static nint DllImportResolver(string libraryName, Assembly assembly, DllImportSearchPath? searchPath) {
 		if (NativeLibrary.TryLoad(libraryName, assembly, searchPath, out var handle)) {
 			return handle;
 		}
@@ -34,7 +34,7 @@ public static class CompressionHelper {
 		} else if (OperatingSystem.IsMacOS()) {
 			target += ".dylib";
 		} else {
-			return IntPtr.Zero;
+			return nint.Zero;
 		}
 
 		if (File.Exists(target)) {
@@ -49,7 +49,7 @@ public static class CompressionHelper {
 			}
 		}
 
-		return IntPtr.Zero;
+		return nint.Zero;
 	}
 
 	internal static bool CanLoadLibrary(string libraryName) => NativeLibrary.TryLoad(libraryName, out _);

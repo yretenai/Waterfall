@@ -188,7 +188,7 @@ public sealed partial class ZStandard : IDisposable {
 	public unsafe bool UnloadDict() {
 		var result1 = NativeMethods.ZSTD_DCtx_loadDictionary_advanced(DContext, (byte*) nint.Zero, 0, 0, 0);
 		var result2 = NativeMethods.ZSTD_CCtx_loadDictionary_advanced(CContext, (byte*) nint.Zero, 0, 0, 0);
-		if ((nint) DictPin.Pointer != IntPtr.Zero) {
+		if ((nint) DictPin.Pointer != nint.Zero) {
 			FreeDict();
 		}
 
@@ -196,7 +196,7 @@ public sealed partial class ZStandard : IDisposable {
 	}
 
 	private unsafe void FreeDict() {
-		if ((nint) DictPin.Pointer != IntPtr.Zero) {
+		if ((nint) DictPin.Pointer != nint.Zero) {
 			DictPin.Dispose();
 			DictPin = default;
 			Dict = Memory<byte>.Empty;
