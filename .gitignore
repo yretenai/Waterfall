@@ -333,5 +333,4 @@ nuget.config
 *.patch
 
 **/*lzo*
-**/*zstd*
 **/*oo2core*
