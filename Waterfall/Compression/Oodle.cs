@@ -173,9 +173,7 @@ public static partial class Oodle {
 		}
 	}
 
-	public static int Compress(Memory<byte> input, Memory<byte> output) {
-		return Compress(input, output, Memory<byte>.Empty, OodleLZ_Compressor.Hydra, OodleLZ_CompressionLevel.HyperFast4, GetDefaultOptions(OodleLZ_Compressor.Hydra, OodleLZ_CompressionLevel.HyperFast4));
-	}
+	public static int Compress(Memory<byte> input, Memory<byte> output) => Compress(input, output, Memory<byte>.Empty, OodleLZ_Compressor.Hydra, OodleLZ_CompressionLevel.HyperFast4, GetDefaultOptions(OodleLZ_Compressor.Hydra, OodleLZ_CompressionLevel.HyperFast4));
 
 	private static unsafe OodleLZ_CompressOptions GetDefaultOptions(OodleLZ_Compressor compressor, OodleLZ_CompressionLevel level) {
 		var options = Unsafe.Read<OodleLZ_CompressOptions>(NativeMethods.OodleLZ_CompressOptions_GetDefault(compressor, level));
