@@ -87,6 +87,14 @@ public static class CompressionHelper {
 
 				return decompressed.Length;
 			}
+			case CompressionType.Deflate: {
+				using var dataPin = compressed.Pin();
+				using var dataStream = new UnmanagedMemoryStream((byte*) dataPin.Pointer, compressed.Length);
+				using var deflate = new DeflateStream(dataStream, CompressionMode.Decompress);
+				deflate.ReadExactly(decompressed.Span);
+
+				return decompressed.Length;
+			}
 			case CompressionType.Zstd: {
 				using var zstd = new ZStandard();
 				var n = zstd.Decompress(compressed, decompressed);
