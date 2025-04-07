@@ -10,6 +10,7 @@ public static class CompressionHelper {
 	internal const string LzxLibraryName = "chm";
 	internal const string LzoLibraryName = "lzo2";
 	internal const string OodleLibraryName = "oo2core";
+	internal const string OodleTexLibraryName = "oo2texrt";
 	internal const string ZstdLibraryName = "zstd";
 	internal const string DensityLibraryName = "density";
 
@@ -59,6 +60,7 @@ public static class CompressionHelper {
 		return compressionType switch {
 			       CompressionType.None => true,
 			       CompressionType.Oodle => CanLoadLibrary(OodleLibraryName),
+			       CompressionType.OodleTex => CanLoadLibrary(OodleTexLibraryName),
 			       CompressionType.Brotli => true,
 			       CompressionType.Zlib => true,
 			       CompressionType.Deflate => true,
@@ -115,6 +117,14 @@ public static class CompressionHelper {
 			}
 			case CompressionType.Oodle: {
 				var n = Oodle.Decompress(compressed, decompressed);
+				if (n < 0) {
+					throw new InvalidOperationException("decompression failed");
+				}
+
+				return n;
+			}
+			case CompressionType.OodleTex: {
+				var n = OodleTex.Decompress(compressed, decompressed);
 				if (n < 0) {
 					throw new InvalidOperationException("decompression failed");
 				}

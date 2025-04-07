@@ -3,6 +3,7 @@ namespace Waterfall.Compression;
 public enum CompressionType {
 	None,
 	Oodle,
+	OodleTex,
 	Brotli,
 	Zlib,
 	Deflate,
