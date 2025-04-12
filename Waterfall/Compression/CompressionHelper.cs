@@ -195,11 +195,12 @@ public static class CompressionHelper {
 					}
 
 					coder.Code(inStream, outStream, inStream.Length - inStream.Position, outStream.Length, null);
+					outStream.Flush();
 				} finally {
 					ArrayPool<byte>.Shared.Return(array);
 				}
 
-				return decompressed.Length;
+				return (int) outStream.Length;
 			}
 			case CompressionType.Density: {
 				var n = Density.Decompress(compressed, decompressed);
@@ -217,20 +218,29 @@ public static class CompressionHelper {
 		}
 	}
 
-	public static unsafe int Compress(CompressionType type, Memory<byte> compressed, Memory<byte> decompressed) {
+	public static unsafe int Compress(CompressionType type, Memory<byte> compressed, Memory<byte> decompressed, CompressionLevel compressionLevel = CompressionLevel.Fastest) {
 		switch (type) {
 			case CompressionType.Zlib: {
-				using var dataPin = compressed.Pin();
-				using var dataStream = new UnmanagedMemoryStream((byte*) dataPin.Pointer, compressed.Length);
-				using var zlib = new ZLibStream(dataStream, CompressionMode.Compress);
-				zlib.Write(decompressed.Span);
+				using var dataPin = decompressed.Pin();
+				using var dataStream = new UnmanagedMemoryStream((byte*) dataPin.Pointer, decompressed.Length);
+				using var zlib = new ZLibStream(dataStream, compressionLevel);
+				zlib.Write(compressed.Span);
+				zlib.Flush();
+
+				return (int) zlib.Position;
+			}
+			case CompressionType.Deflate: {
+				using var dataPin = decompressed.Pin();
+				using var dataStream = new UnmanagedMemoryStream((byte*) dataPin.Pointer, decompressed.Length);
+				using var zlib = new DeflateStream(dataStream, compressionLevel);
+				zlib.Write(compressed.Span);
 				zlib.Flush();
 
 				return (int) zlib.Position;
 			}
 			case CompressionType.Zstd: {
 				using var zstd = new ZStandard();
-				var n = (int) zstd.Compress(decompressed, compressed, ZSTDCompressionLevel.DecompressFast);
+				var n = (int) zstd.Compress(decompressed, compressed, ZSTDCompressionLevel.BTOptimal);
 				if (n < 0) {
 					throw new InvalidOperationException("compression failed");
 				}
@@ -241,7 +251,7 @@ public static class CompressionHelper {
 				using var dataPin = compressed.Pin();
 				using var dataStream = new UnmanagedMemoryStream((byte*) dataPin.Pointer, compressed.Length);
 				dataStream.Position = 2;
-				using var zlib = new GZipStream(dataStream, CompressionMode.Compress);
+				using var zlib = new GZipStream(dataStream, compressionLevel);
 				zlib.Write(decompressed.Span);
 				zlib.Flush();
 
@@ -267,15 +277,15 @@ public static class CompressionHelper {
 			case CompressionType.Brotli: {
 				using var dataPin = compressed.Pin();
 				using var dataStream = new UnmanagedMemoryStream((byte*) dataPin.Pointer, compressed.Length);
-				using var brotli = new BrotliStream(dataStream, CompressionMode.Compress);
+				using var brotli = new BrotliStream(dataStream, compressionLevel);
 				brotli.Write(decompressed.Span);
 				brotli.Flush();
 
 				return (int) brotli.Position;
 			}
 			case CompressionType.None:
-				compressed.CopyTo(decompressed);
-				return compressed.Length;
+				decompressed.CopyTo(compressed);
+				return decompressed.Length;
 			default:
 				throw new NotSupportedException("Compression type is not supported");
 		}
