@@ -11,6 +11,7 @@ public enum ZSTDDecompressionParameter {
 }
 
 public enum ZSTDCompressionLevel {
+	None = 0,
 	Fast = 1,
 	DecompressFast = 2,
 	Greedy = 3,

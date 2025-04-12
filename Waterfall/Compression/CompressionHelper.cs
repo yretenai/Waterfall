@@ -240,7 +240,14 @@ public static class CompressionHelper {
 			}
 			case CompressionType.Zstd: {
 				using var zstd = new ZStandard();
-				var n = (int) zstd.Compress(decompressed, compressed, ZSTDCompressionLevel.BTOptimal);
+				var n = (int) zstd.Compress(decompressed, compressed,
+				                            compressionLevel switch {
+					                            CompressionLevel.Optimal => ZSTDCompressionLevel.BTOptimal,
+					                            CompressionLevel.Fastest => ZSTDCompressionLevel.DecompressFast,
+					                            CompressionLevel.NoCompression => ZSTDCompressionLevel.None,
+					                            CompressionLevel.SmallestSize => ZSTDCompressionLevel.BTVeryUltra,
+					                            _ => throw new ArgumentOutOfRangeException(nameof(compressionLevel), compressionLevel, null)
+				                            });
 				if (n < 0) {
 					throw new InvalidOperationException("compression failed");
 				}
@@ -258,7 +265,14 @@ public static class CompressionHelper {
 				return (int) zlib.Position;
 			}
 			case CompressionType.Oodle: {
-				var n = Oodle.Compress(decompressed, compressed);
+				var n = Oodle.Compress(decompressed, compressed, Oodle.OodleLZ_Compressor.Hydra,
+				                       compressionLevel switch {
+					                       CompressionLevel.Optimal => Oodle.OodleLZ_CompressionLevel.Optimal,
+					                       CompressionLevel.Fastest => Oodle.OodleLZ_CompressionLevel.Min,
+					                       CompressionLevel.NoCompression => Oodle.OodleLZ_CompressionLevel.None,
+					                       CompressionLevel.SmallestSize => Oodle.OodleLZ_CompressionLevel.Max,
+					                       _ => throw new ArgumentOutOfRangeException(nameof(compressionLevel), compressionLevel, null),
+				                       });
 				if (n < 0) {
 					throw new InvalidOperationException("compression failed");
 				}
