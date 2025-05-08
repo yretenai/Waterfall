@@ -7,6 +7,25 @@ public sealed partial class OodleTex {
 		AvoidWideVectors = 2,
 	}
 
+	public static int Decompress(Memory<byte> input, Memory<byte> output) => Decompress(input[Unsafe.SizeOf<BC7PrepHeader>()..], output, MemoryMarshal.Read<BC7PrepHeader>(input.Span));
+
+	public static unsafe int Decompress(Memory<byte> input, Memory<byte> output, BC7PrepHeader header, BC7PrepDecodeFlags flags = BC7PrepDecodeFlags.None) {
+		using var inPin = input.Pin();
+		using var outPin = output.Pin();
+		if (NativeMethods.OodleTexRT_BC7Prep_ReadHeader(ref header, out var blocks, out var payloadSize) != 0) {
+			return -1;
+		}
+
+		if (payloadSize > output.Length) {
+			return -1;
+		}
+
+		var scratchBound = NativeMethods.OodleTexRT_BC7Prep_MinDecodeScratchSize(blocks);
+		using var scratch = MemoryPool<byte>.Shared.Rent((int) scratchBound);
+		using var scratchPin = scratch.Memory.Pin();
+		return NativeMethods.OodleTexRT_BC7Prep_Decode((byte*) outPin.Pointer, output.Length, (byte*) inPin.Pointer, input.Length, ref header, flags, (byte*) scratchPin.Pointer, scratch.Memory.Length);
+	}
+
 	[InlineArray(10), StructLayout(LayoutKind.Sequential, Pack = 4)]
 	public struct BC7ModeCounts : IEquatable<BC7ModeCounts> {
 		public uint Value;
@@ -30,25 +49,6 @@ public sealed partial class OodleTex {
 		public uint Version { get; set; }
 		public uint Flags { get; set; }
 		public BC7ModeCounts ModeCounts { get; set; }
-	}
-
-	public static int Decompress(Memory<byte> input, Memory<byte> output) => Decompress(input[Unsafe.SizeOf<BC7PrepHeader>()..], output, MemoryMarshal.Read<BC7PrepHeader>(input.Span));
-
-	public static unsafe int Decompress(Memory<byte> input, Memory<byte> output, BC7PrepHeader header, BC7PrepDecodeFlags flags = BC7PrepDecodeFlags.None) {
-		using var inPin = input.Pin();
-		using var outPin = output.Pin();
-		if (NativeMethods.OodleTexRT_BC7Prep_ReadHeader(ref header, out var blocks, out var payloadSize) != 0) {
-			return -1;
-		}
-
-		if (payloadSize > output.Length) {
-			return -1;
-		}
-
-		var scratchBound = NativeMethods.OodleTexRT_BC7Prep_MinDecodeScratchSize(blocks);
-		using var scratch = MemoryPool<byte>.Shared.Rent((int) scratchBound);
-		using var scratchPin = scratch.Memory.Pin();
-		return NativeMethods.OodleTexRT_BC7Prep_Decode((byte*) outPin.Pointer, output.Length, (byte*) inPin.Pointer, input.Length, ref header, flags, (byte*) scratchPin.Pointer, scratch.Memory.Length);
 	}
 
 	private static partial class NativeMethods {

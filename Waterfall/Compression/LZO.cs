@@ -14,7 +14,7 @@ public sealed partial class LZO {
 		using var inPin = input.Pin();
 		using var outPin = output.Pin();
 		var len = output.Length;
-		if (NativeMethods.lzo1x_decompress_safe((byte*) inPin.Pointer, input.Length, (byte*) outPin.Pointer, ref len, null) != 0) {
+		if (NativeMethods.lzo1x_decompress_safe((byte*) inPin.Pointer, input.Length, (byte*) outPin.Pointer, ref len, default) != 0) {
 			return -1;
 		}
 
@@ -25,7 +25,7 @@ public sealed partial class LZO {
 		using var inPin = input.Pin();
 		using var outPin = output.Pin();
 		var len = output.Length;
-		if (NativeMethods.lzo2a_decompress_safe((byte*) inPin.Pointer, input.Length, (byte*) outPin.Pointer, ref len, null) != 0) {
+		if (NativeMethods.lzo2a_decompress_safe((byte*) inPin.Pointer, input.Length, (byte*) outPin.Pointer, ref len, default) != 0) {
 			return -1;
 		}
 

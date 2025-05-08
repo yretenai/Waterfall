@@ -194,7 +194,7 @@ public static class CompressionHelper {
 							break;
 					}
 
-					coder.Code(inStream, outStream, inStream.Length - inStream.Position, outStream.Length, null);
+					coder.Code(inStream, outStream, inStream.Length - inStream.Position, outStream.Length, default);
 					outStream.Flush();
 				} finally {
 					ArrayPool<byte>.Shared.Return(array);
@@ -246,7 +246,7 @@ public static class CompressionHelper {
 					                            CompressionLevel.Fastest => ZSTDCompressionLevel.DecompressFast,
 					                            CompressionLevel.NoCompression => ZSTDCompressionLevel.None,
 					                            CompressionLevel.SmallestSize => ZSTDCompressionLevel.BTVeryUltra,
-					                            _ => throw new ArgumentOutOfRangeException(nameof(compressionLevel), compressionLevel, null)
+					                            _ => throw new ArgumentOutOfRangeException(nameof(compressionLevel), compressionLevel, default),
 				                            });
 				if (n < 0) {
 					throw new InvalidOperationException("compression failed");
@@ -271,7 +271,7 @@ public static class CompressionHelper {
 					                       CompressionLevel.Fastest => Oodle.OodleLZ_CompressionLevel.Min,
 					                       CompressionLevel.NoCompression => Oodle.OodleLZ_CompressionLevel.None,
 					                       CompressionLevel.SmallestSize => Oodle.OodleLZ_CompressionLevel.Max,
-					                       _ => throw new ArgumentOutOfRangeException(nameof(compressionLevel), compressionLevel, null),
+					                       _ => throw new ArgumentOutOfRangeException(nameof(compressionLevel), compressionLevel, default),
 				                       });
 				if (n < 0) {
 					throw new InvalidOperationException("compression failed");

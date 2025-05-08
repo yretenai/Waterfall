@@ -118,10 +118,10 @@ public static partial class Oodle {
 		using var outPin = output.Pin();
 		using var pool = MemoryPool<byte>.Shared.Rent(BlockDecoderMemorySizeNeeded);
 		using var poolPin = pool.Memory.Pin();
-		return NativeMethods.OodleLZ_Decompress((byte*) inPin.Pointer, input.Length, (byte*) outPin.Pointer, output.Length, true, false, OodleLZ_Verbosity.Minimal, null, 0, null, null, (byte*) poolPin.Pointer, BlockDecoderMemorySizeNeeded, OodleLZ_Decode_ThreadPhase.Unthreaded);
+		return NativeMethods.OodleLZ_Decompress((byte*) inPin.Pointer, input.Length, (byte*) outPin.Pointer, output.Length, true, false, OodleLZ_Verbosity.Minimal, default, 0, default, default, (byte*) poolPin.Pointer, BlockDecoderMemorySizeNeeded, OodleLZ_Decode_ThreadPhase.Unthreaded);
 	}
 
-	public static IMemoryOwner<byte>? Decompress(Memory<byte> input, MemoryPool<byte>? pool = null) {
+	public static IMemoryOwner<byte>? Decompress(Memory<byte> input, MemoryPool<byte>? pool = default) {
 		var size = GetDecodeBufferSize(input, false);
 		var output = (pool ?? MemoryPool<byte>.Shared).Rent(size);
 		if (Decompress(input, output.Memory[..size]) != -1) {
@@ -129,10 +129,10 @@ public static partial class Oodle {
 		}
 
 		output.Dispose();
-		return null;
+		return default;
 	}
 
-	public static IMemoryOwner<byte>? Compress(Memory<byte> input, OodleLZ_Compressor compressor, OodleLZ_CompressionLevel level, MemoryPool<byte>? pool = null) {
+	public static IMemoryOwner<byte>? Compress(Memory<byte> input, OodleLZ_Compressor compressor, OodleLZ_CompressionLevel level, MemoryPool<byte>? pool = default) {
 		var size = GetCompressedBufferSize(compressor, input.Length);
 		var output = (pool ?? MemoryPool<byte>.Shared).Rent(size);
 		if (Compress(input, output.Memory[..size], compressor, level) != -1) {
@@ -140,7 +140,7 @@ public static partial class Oodle {
 		}
 
 		output.Dispose();
-		return null;
+		return default;
 	}
 
 	public static int Compress(Memory<byte> input, Memory<byte> output, OodleLZ_Compressor compressor, OodleLZ_CompressionLevel level) {

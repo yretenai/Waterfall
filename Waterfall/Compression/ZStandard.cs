@@ -151,7 +151,7 @@ public sealed partial class ZStandard : IDisposable {
 		return (int) NativeMethods.ZSTD_decompressDCtx(DContext, (byte*) outPin.Pointer, output.Length, (byte*) inPin.Pointer, input.Length);
 	}
 
-	public IMemoryOwner<byte>? Decompress(Memory<byte> input, MemoryPool<byte>? pool = null) {
+	public IMemoryOwner<byte>? Decompress(Memory<byte> input, MemoryPool<byte>? pool = default) {
 		var size = GetDecompressBound(input);
 		var output = (pool ?? MemoryPool<byte>.Shared).Rent(size);
 		if (Decompress(input, output.Memory[..size]) != -1) {
@@ -159,7 +159,7 @@ public sealed partial class ZStandard : IDisposable {
 		}
 
 		output.Dispose();
-		return null;
+		return default;
 	}
 
 	public unsafe long Compress(Memory<byte> input, Memory<byte> output, ZSTDCompressionLevel compressionLevel) {
@@ -168,7 +168,7 @@ public sealed partial class ZStandard : IDisposable {
 		return NativeMethods.ZSTD_compressCCtx(DContext, (byte*) outPin.Pointer, output.Length, (byte*) inPin.Pointer, input.Length, compressionLevel);
 	}
 
-	public IMemoryOwner<byte>? Compress(Memory<byte> input, ZSTDCompressionLevel compressionLevel, MemoryPool<byte>? pool = null) {
+	public IMemoryOwner<byte>? Compress(Memory<byte> input, ZSTDCompressionLevel compressionLevel, MemoryPool<byte>? pool = default) {
 		var size = GetCompressBound(input);
 		var output = (pool ?? MemoryPool<byte>.Shared).Rent(size);
 		if (Compress(input, output.Memory[..size], compressionLevel) != -1) {
@@ -176,7 +176,7 @@ public sealed partial class ZStandard : IDisposable {
 		}
 
 		output.Dispose();
-		return null;
+		return default;
 	}
 
 	public static int GetCompressBound(Memory<byte> bytes) => (int) NativeMethods.ZSTD_compressBound(bytes.Length);

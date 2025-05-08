@@ -28,8 +28,8 @@ public sealed class CRCAlgorithm<T> : SpanHashAlgorithm<T>
 		var width = sizeof(T) * 8;
 		var msb = 1ul << (width - 1);
 		var align = width - 8;
-		var poly = Polynomial.ToUInt64(null);
-		var mask = T.MaxValue.ToUInt64(null);
+		var poly = Polynomial.ToUInt64(default);
+		var mask = T.MaxValue.ToUInt64(default);
 
 		for (var i = 0ul; i < 256; ++i) {
 			var r = i;
@@ -60,9 +60,9 @@ public sealed class CRCAlgorithm<T> : SpanHashAlgorithm<T>
 		while (cbSize > 0) {
 			var @byte = T.CreateTruncating(array[ibStart++]);
 			if (ReflectOut) {
-				Value = Table[(Value ^ @byte).ToUInt64(null) & 0xFF] ^ (Value >> 8);
+				Value = Table[(Value ^ @byte).ToUInt64(default) & 0xFF] ^ (Value >> 8);
 			} else {
-				Value = Table[((Value >> (sizeof(T) * 8 - 8)) ^ @byte).ToUInt64(null) & 0xFF] ^ (Value << 8);
+				Value = Table[((Value >> (sizeof(T) * 8 - 8)) ^ @byte).ToUInt64(default) & 0xFF] ^ (Value << 8);
 			}
 
 			cbSize--;
