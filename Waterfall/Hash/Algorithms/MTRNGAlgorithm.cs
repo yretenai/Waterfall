@@ -109,7 +109,8 @@ public sealed class MTRNGAlgorithm<T> where T : struct, IUnsignedNumber<T>, IBin
 		}
 
 		if (n % Unsafe.SizeOf<T>() != 0) {
-			Span<byte> tmp = stackalloc byte[Align(n, Unsafe.SizeOf<T>())];
+			// ReSharper disable once ArrangeRedundantParentheses
+			var tmp = (stackalloc byte[Align(n, Unsafe.SizeOf<T>())]);
 			var arr = MemoryMarshal.Cast<byte, T>(bytes);
 
 			for (var i = 0; i < arr.Length; ++i) {

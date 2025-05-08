@@ -16,10 +16,9 @@ public abstract class SpanHashAlgorithm<T> : HashAlgorithm
 	public abstract void Reset();
 
 	protected override byte[] HashFinal() {
-		Span<T> tmp = stackalloc T[1];
-		tmp[0] = GetValueFinal();
+		var tmp = GetValueFinal();
 		Reset();
-		return MemoryMarshal.AsBytes(tmp).ToArray();
+		return MemoryMarshal.AsBytes(new Span<T>(ref tmp)).ToArray();
 	}
 
 	public virtual T ComputeHashValue(ReadOnlySpan<byte> bytes) {
