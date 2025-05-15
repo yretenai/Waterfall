@@ -21,7 +21,7 @@ public class MD4Algorithm : HashAlgorithm {
 			block[k] = (block[k] & ~((uint) 255 << (int) s)) | ((uint) b << (int) s);
 
 			if (c == 63) {
-				ProcessBlock();
+				ProcessBlock(ref block);
 			}
 
 			Length++;
@@ -74,59 +74,59 @@ public class MD4Algorithm : HashAlgorithm {
 
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-	private void ProcessBlock() {
+	private void ProcessBlock(ref BlockStack block) {
 		var stack = Stack;
 
-		stack[0] = BitOperations.RotateLeft(stack[0] + F(stack[1], stack[2], stack[3]) + Block[0], 3);
-		stack[3] = BitOperations.RotateLeft(stack[3] + F(stack[0], stack[1], stack[2]) + Block[1], 7);
-		stack[2] = BitOperations.RotateLeft(stack[2] + F(stack[3], stack[0], stack[1]) + Block[2], 11);
-		stack[1] = BitOperations.RotateLeft(stack[1] + F(stack[2], stack[3], stack[0]) + Block[3], 19);
-		stack[0] = BitOperations.RotateLeft(stack[0] + F(stack[1], stack[2], stack[3]) + Block[4], 3);
-		stack[3] = BitOperations.RotateLeft(stack[3] + F(stack[0], stack[1], stack[2]) + Block[5], 7);
-		stack[2] = BitOperations.RotateLeft(stack[2] + F(stack[3], stack[0], stack[1]) + Block[6], 11);
-		stack[1] = BitOperations.RotateLeft(stack[1] + F(stack[2], stack[3], stack[0]) + Block[7], 19);
-		stack[0] = BitOperations.RotateLeft(stack[0] + F(stack[1], stack[2], stack[3]) + Block[8], 3);
-		stack[3] = BitOperations.RotateLeft(stack[3] + F(stack[0], stack[1], stack[2]) + Block[9], 7);
-		stack[2] = BitOperations.RotateLeft(stack[2] + F(stack[3], stack[0], stack[1]) + Block[10], 11);
-		stack[1] = BitOperations.RotateLeft(stack[1] + F(stack[2], stack[3], stack[0]) + Block[11], 19);
-		stack[0] = BitOperations.RotateLeft(stack[0] + F(stack[1], stack[2], stack[3]) + Block[12], 3);
-		stack[3] = BitOperations.RotateLeft(stack[3] + F(stack[0], stack[1], stack[2]) + Block[13], 7);
-		stack[2] = BitOperations.RotateLeft(stack[2] + F(stack[3], stack[0], stack[1]) + Block[14], 11);
-		stack[1] = BitOperations.RotateLeft(stack[1] + F(stack[2], stack[3], stack[0]) + Block[15], 19);
+		stack[0] = BitOperations.RotateLeft(stack[0] + F(stack[1], stack[2], stack[3]) + block[0], 3);
+		stack[3] = BitOperations.RotateLeft(stack[3] + F(stack[0], stack[1], stack[2]) + block[1], 7);
+		stack[2] = BitOperations.RotateLeft(stack[2] + F(stack[3], stack[0], stack[1]) + block[2], 11);
+		stack[1] = BitOperations.RotateLeft(stack[1] + F(stack[2], stack[3], stack[0]) + block[3], 19);
+		stack[0] = BitOperations.RotateLeft(stack[0] + F(stack[1], stack[2], stack[3]) + block[4], 3);
+		stack[3] = BitOperations.RotateLeft(stack[3] + F(stack[0], stack[1], stack[2]) + block[5], 7);
+		stack[2] = BitOperations.RotateLeft(stack[2] + F(stack[3], stack[0], stack[1]) + block[6], 11);
+		stack[1] = BitOperations.RotateLeft(stack[1] + F(stack[2], stack[3], stack[0]) + block[7], 19);
+		stack[0] = BitOperations.RotateLeft(stack[0] + F(stack[1], stack[2], stack[3]) + block[8], 3);
+		stack[3] = BitOperations.RotateLeft(stack[3] + F(stack[0], stack[1], stack[2]) + block[9], 7);
+		stack[2] = BitOperations.RotateLeft(stack[2] + F(stack[3], stack[0], stack[1]) + block[10], 11);
+		stack[1] = BitOperations.RotateLeft(stack[1] + F(stack[2], stack[3], stack[0]) + block[11], 19);
+		stack[0] = BitOperations.RotateLeft(stack[0] + F(stack[1], stack[2], stack[3]) + block[12], 3);
+		stack[3] = BitOperations.RotateLeft(stack[3] + F(stack[0], stack[1], stack[2]) + block[13], 7);
+		stack[2] = BitOperations.RotateLeft(stack[2] + F(stack[3], stack[0], stack[1]) + block[14], 11);
+		stack[1] = BitOperations.RotateLeft(stack[1] + F(stack[2], stack[3], stack[0]) + block[15], 19);
 
-		stack[0] = BitOperations.RotateLeft(stack[0] + G(stack[1], stack[2], stack[3]) + Block[0] + 0x5A827999, 3);
-		stack[3] = BitOperations.RotateLeft(stack[3] + G(stack[0], stack[1], stack[2]) + Block[4] + 0x5A827999, 5);
-		stack[2] = BitOperations.RotateLeft(stack[2] + G(stack[3], stack[0], stack[1]) + Block[8] + 0x5A827999, 9);
-		stack[1] = BitOperations.RotateLeft(stack[1] + G(stack[2], stack[3], stack[0]) + Block[12] + 0x5A827999, 13);
-		stack[0] = BitOperations.RotateLeft(stack[0] + G(stack[1], stack[2], stack[3]) + Block[1] + 0x5A827999, 3);
-		stack[3] = BitOperations.RotateLeft(stack[3] + G(stack[0], stack[1], stack[2]) + Block[5] + 0x5A827999, 5);
-		stack[2] = BitOperations.RotateLeft(stack[2] + G(stack[3], stack[0], stack[1]) + Block[9] + 0x5A827999, 9);
-		stack[1] = BitOperations.RotateLeft(stack[1] + G(stack[2], stack[3], stack[0]) + Block[13] + 0x5A827999, 13);
-		stack[0] = BitOperations.RotateLeft(stack[0] + G(stack[1], stack[2], stack[3]) + Block[2] + 0x5A827999, 3);
-		stack[3] = BitOperations.RotateLeft(stack[3] + G(stack[0], stack[1], stack[2]) + Block[6] + 0x5A827999, 5);
-		stack[2] = BitOperations.RotateLeft(stack[2] + G(stack[3], stack[0], stack[1]) + Block[10] + 0x5A827999, 9);
-		stack[1] = BitOperations.RotateLeft(stack[1] + G(stack[2], stack[3], stack[0]) + Block[14] + 0x5A827999, 13);
-		stack[0] = BitOperations.RotateLeft(stack[0] + G(stack[1], stack[2], stack[3]) + Block[3] + 0x5A827999, 3);
-		stack[3] = BitOperations.RotateLeft(stack[3] + G(stack[0], stack[1], stack[2]) + Block[7] + 0x5A827999, 5);
-		stack[2] = BitOperations.RotateLeft(stack[2] + G(stack[3], stack[0], stack[1]) + Block[11] + 0x5A827999, 9);
-		stack[1] = BitOperations.RotateLeft(stack[1] + G(stack[2], stack[3], stack[0]) + Block[15] + 0x5A827999, 13);
+		stack[0] = BitOperations.RotateLeft(stack[0] + G(stack[1], stack[2], stack[3]) + block[0] + 0x5A827999, 3);
+		stack[3] = BitOperations.RotateLeft(stack[3] + G(stack[0], stack[1], stack[2]) + block[4] + 0x5A827999, 5);
+		stack[2] = BitOperations.RotateLeft(stack[2] + G(stack[3], stack[0], stack[1]) + block[8] + 0x5A827999, 9);
+		stack[1] = BitOperations.RotateLeft(stack[1] + G(stack[2], stack[3], stack[0]) + block[12] + 0x5A827999, 13);
+		stack[0] = BitOperations.RotateLeft(stack[0] + G(stack[1], stack[2], stack[3]) + block[1] + 0x5A827999, 3);
+		stack[3] = BitOperations.RotateLeft(stack[3] + G(stack[0], stack[1], stack[2]) + block[5] + 0x5A827999, 5);
+		stack[2] = BitOperations.RotateLeft(stack[2] + G(stack[3], stack[0], stack[1]) + block[9] + 0x5A827999, 9);
+		stack[1] = BitOperations.RotateLeft(stack[1] + G(stack[2], stack[3], stack[0]) + block[13] + 0x5A827999, 13);
+		stack[0] = BitOperations.RotateLeft(stack[0] + G(stack[1], stack[2], stack[3]) + block[2] + 0x5A827999, 3);
+		stack[3] = BitOperations.RotateLeft(stack[3] + G(stack[0], stack[1], stack[2]) + block[6] + 0x5A827999, 5);
+		stack[2] = BitOperations.RotateLeft(stack[2] + G(stack[3], stack[0], stack[1]) + block[10] + 0x5A827999, 9);
+		stack[1] = BitOperations.RotateLeft(stack[1] + G(stack[2], stack[3], stack[0]) + block[14] + 0x5A827999, 13);
+		stack[0] = BitOperations.RotateLeft(stack[0] + G(stack[1], stack[2], stack[3]) + block[3] + 0x5A827999, 3);
+		stack[3] = BitOperations.RotateLeft(stack[3] + G(stack[0], stack[1], stack[2]) + block[7] + 0x5A827999, 5);
+		stack[2] = BitOperations.RotateLeft(stack[2] + G(stack[3], stack[0], stack[1]) + block[11] + 0x5A827999, 9);
+		stack[1] = BitOperations.RotateLeft(stack[1] + G(stack[2], stack[3], stack[0]) + block[15] + 0x5A827999, 13);
 
-		stack[0] = BitOperations.RotateLeft(stack[0] + H(stack[1], stack[2], stack[3]) + Block[0] + 0x6ED9EBA1, 3);
-		stack[3] = BitOperations.RotateLeft(stack[3] + H(stack[0], stack[1], stack[2]) + Block[8] + 0x6ED9EBA1, 9);
-		stack[2] = BitOperations.RotateLeft(stack[2] + H(stack[3], stack[0], stack[1]) + Block[4] + 0x6ED9EBA1, 11);
-		stack[1] = BitOperations.RotateLeft(stack[1] + H(stack[2], stack[3], stack[0]) + Block[12] + 0x6ED9EBA1, 15);
-		stack[0] = BitOperations.RotateLeft(stack[0] + H(stack[1], stack[2], stack[3]) + Block[2] + 0x6ED9EBA1, 3);
-		stack[3] = BitOperations.RotateLeft(stack[3] + H(stack[0], stack[1], stack[2]) + Block[10] + 0x6ED9EBA1, 9);
-		stack[2] = BitOperations.RotateLeft(stack[2] + H(stack[3], stack[0], stack[1]) + Block[6] + 0x6ED9EBA1, 11);
-		stack[1] = BitOperations.RotateLeft(stack[1] + H(stack[2], stack[3], stack[0]) + Block[14] + 0x6ED9EBA1, 15);
-		stack[0] = BitOperations.RotateLeft(stack[0] + H(stack[1], stack[2], stack[3]) + Block[1] + 0x6ED9EBA1, 3);
-		stack[3] = BitOperations.RotateLeft(stack[3] + H(stack[0], stack[1], stack[2]) + Block[9] + 0x6ED9EBA1, 9);
-		stack[2] = BitOperations.RotateLeft(stack[2] + H(stack[3], stack[0], stack[1]) + Block[5] + 0x6ED9EBA1, 11);
-		stack[1] = BitOperations.RotateLeft(stack[1] + H(stack[2], stack[3], stack[0]) + Block[13] + 0x6ED9EBA1, 15);
-		stack[0] = BitOperations.RotateLeft(stack[0] + H(stack[1], stack[2], stack[3]) + Block[3] + 0x6ED9EBA1, 3);
-		stack[3] = BitOperations.RotateLeft(stack[3] + H(stack[0], stack[1], stack[2]) + Block[11] + 0x6ED9EBA1, 9);
-		stack[2] = BitOperations.RotateLeft(stack[2] + H(stack[3], stack[0], stack[1]) + Block[7] + 0x6ED9EBA1, 11);
-		stack[1] = BitOperations.RotateLeft(stack[1] + H(stack[2], stack[3], stack[0]) + Block[15] + 0x6ED9EBA1, 15);
+		stack[0] = BitOperations.RotateLeft(stack[0] + H(stack[1], stack[2], stack[3]) + block[0] + 0x6ED9EBA1, 3);
+		stack[3] = BitOperations.RotateLeft(stack[3] + H(stack[0], stack[1], stack[2]) + block[8] + 0x6ED9EBA1, 9);
+		stack[2] = BitOperations.RotateLeft(stack[2] + H(stack[3], stack[0], stack[1]) + block[4] + 0x6ED9EBA1, 11);
+		stack[1] = BitOperations.RotateLeft(stack[1] + H(stack[2], stack[3], stack[0]) + block[12] + 0x6ED9EBA1, 15);
+		stack[0] = BitOperations.RotateLeft(stack[0] + H(stack[1], stack[2], stack[3]) + block[2] + 0x6ED9EBA1, 3);
+		stack[3] = BitOperations.RotateLeft(stack[3] + H(stack[0], stack[1], stack[2]) + block[10] + 0x6ED9EBA1, 9);
+		stack[2] = BitOperations.RotateLeft(stack[2] + H(stack[3], stack[0], stack[1]) + block[6] + 0x6ED9EBA1, 11);
+		stack[1] = BitOperations.RotateLeft(stack[1] + H(stack[2], stack[3], stack[0]) + block[14] + 0x6ED9EBA1, 15);
+		stack[0] = BitOperations.RotateLeft(stack[0] + H(stack[1], stack[2], stack[3]) + block[1] + 0x6ED9EBA1, 3);
+		stack[3] = BitOperations.RotateLeft(stack[3] + H(stack[0], stack[1], stack[2]) + block[9] + 0x6ED9EBA1, 9);
+		stack[2] = BitOperations.RotateLeft(stack[2] + H(stack[3], stack[0], stack[1]) + block[5] + 0x6ED9EBA1, 11);
+		stack[1] = BitOperations.RotateLeft(stack[1] + H(stack[2], stack[3], stack[0]) + block[13] + 0x6ED9EBA1, 15);
+		stack[0] = BitOperations.RotateLeft(stack[0] + H(stack[1], stack[2], stack[3]) + block[3] + 0x6ED9EBA1, 3);
+		stack[3] = BitOperations.RotateLeft(stack[3] + H(stack[0], stack[1], stack[2]) + block[11] + 0x6ED9EBA1, 9);
+		stack[2] = BitOperations.RotateLeft(stack[2] + H(stack[3], stack[0], stack[1]) + block[7] + 0x6ED9EBA1, 11);
+		stack[1] = BitOperations.RotateLeft(stack[1] + H(stack[2], stack[3], stack[0]) + block[15] + 0x6ED9EBA1, 15);
 
 		unchecked {
 			Stack = new StateStack(Stack[0] + stack[0], Stack[1] + stack[1], Stack[2] + stack[2], Stack[3] + stack[3]);
