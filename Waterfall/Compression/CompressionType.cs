@@ -1,5 +1,6 @@
 namespace Waterfall.Compression;
 
+// Note: Freeze Order! Used in Shard
 public enum CompressionType {
 	None,
 	Oodle,
