@@ -72,10 +72,8 @@ public static partial class Oodle {
 			// not as a dllimport because these may not exist.
 			var handle = CompressionHelper.DllImportResolver(CompressionHelper.OodleLibraryName, Assembly.GetExecutingAssembly(), DllImportSearchPath.SafeDirectories);
 			if (handle != nint.Zero) {
-				if (NativeLibrary.TryGetExport(handle, "OodleCore_Plugin_Printf_Verbose", out var callbackAddress)) {
-					var callback = Marshal.GetDelegateForFunctionPointer<NativeMethods.OodleCore_Plugin_Printf>(callbackAddress);
-					NativeMethods.OodleCore_Plugins_SetPrintf(callback);
-				} else if (NativeLibrary.TryGetExport(handle, "OodleCore_Plugin_Printf_Default", out callbackAddress)) {
+				if (NativeLibrary.TryGetExport(handle, "OodleCore_Plugin_Printf_Verbose", out var callbackAddress) ||
+					NativeLibrary.TryGetExport(handle, "OodleCore_Plugin_Printf_Default", out callbackAddress)) {
 					var callback = Marshal.GetDelegateForFunctionPointer<NativeMethods.OodleCore_Plugin_Printf>(callbackAddress);
 					NativeMethods.OodleCore_Plugins_SetPrintf(callback);
 				}
@@ -230,46 +228,46 @@ public static partial class Oodle {
 		public delegate int OodleCore_Plugin_Printf(int verboseLevel, [MarshalAs(UnmanagedType.LPStr)] string file, int line, [MarshalAs(UnmanagedType.LPStr)] string format);
 
 
-		[LibraryImport(CompressionHelper.OodleLibraryName), DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories), UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		[LibraryImport(CompressionHelper.OodleLibraryName)] [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)] [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
 		public static unsafe partial int OodleLZ_Decompress(byte* srcBuf, long srcSize, byte* rawBuf, long rawSize, [MarshalAs(UnmanagedType.I4)] bool fuzzSafe, [MarshalAs(UnmanagedType.I4)] bool checkCRC, OodleLZ_Verbosity verbosity, byte* decBufBase, long decBufSize, void* fpCallback, void* callbackUserData, byte* decoderMemory, long decoderMemorySize, OodleLZ_Decode_ThreadPhase threadPhase);
 
-		[LibraryImport(CompressionHelper.OodleLibraryName), DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories), UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		[LibraryImport(CompressionHelper.OodleLibraryName)] [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)] [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
 		public static unsafe partial int OodleLZ_Compress(OodleLZ_Compressor compressor, byte* rawBuf, long rawSize, byte* compBuf, OodleLZ_CompressionLevel level, OodleLZ_CompressOptions* options, byte* dictionaryBase, nint lrm, byte* scratchMem, long scratchSize);
 
-		[LibraryImport(CompressionHelper.OodleLibraryName), DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories), UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		[LibraryImport(CompressionHelper.OodleLibraryName)] [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)] [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
 		public static unsafe partial OodleLZ_Compressor OodleLZ_GetFirstChunkCompressor(byte* srcBuf, long srcSize, [MarshalAs(UnmanagedType.I4)] ref bool independent);
 
-		[LibraryImport(CompressionHelper.OodleLibraryName), DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories), UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		[LibraryImport(CompressionHelper.OodleLibraryName)] [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)] [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
 		[return: MarshalAs(UnmanagedType.LPStr)]
 		public static partial string OodleLZ_Compressor_GetName(OodleLZ_Compressor compressor);
 
-		[LibraryImport(CompressionHelper.OodleLibraryName), DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories), UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		[LibraryImport(CompressionHelper.OodleLibraryName)] [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)] [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
 		public static partial void Oodle_LogHeader();
 
-		[LibraryImport(CompressionHelper.OodleLibraryName), DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories), UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		[LibraryImport(CompressionHelper.OodleLibraryName)] [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)] [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
 		public static partial int Oodle_CheckVersion(uint oodleHeaderVersion, ref uint oodleLibVersion);
 
-		[LibraryImport(CompressionHelper.OodleLibraryName), DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories), UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		[LibraryImport(CompressionHelper.OodleLibraryName)] [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)] [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
 		[return: MarshalAs(UnmanagedType.FunctionPtr)]
 		public static partial void OodleCore_Plugins_SetPrintf([MarshalAs(UnmanagedType.FunctionPtr)] OodleCore_Plugin_Printf rrRawPrintf);
 
-		[LibraryImport(CompressionHelper.OodleLibraryName), DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories), UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		[LibraryImport(CompressionHelper.OodleLibraryName)] [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)] [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
 		[return: MarshalAs(UnmanagedType.FunctionPtr)]
 		public static partial void OodleCore_Plugins_SetAssertion([MarshalAs(UnmanagedType.FunctionPtr)] OodleCore_Plugin_DisplayAssertion rrDisplayAssertion);
 
-		[LibraryImport(CompressionHelper.OodleLibraryName), DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories), UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		[LibraryImport(CompressionHelper.OodleLibraryName)] [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)] [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
 		public static partial int OodleLZDecoder_MemorySizeNeeded(OodleLZ_Compressor compressor, long size);
 
-		[LibraryImport(CompressionHelper.OodleLibraryName), DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories), UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		[LibraryImport(CompressionHelper.OodleLibraryName)] [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)] [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
 		public static partial long OodleLZ_GetCompressedBufferSizeNeeded(OodleLZ_Compressor compressor, long size);
 
-		[LibraryImport(CompressionHelper.OodleLibraryName), DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories), UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		[LibraryImport(CompressionHelper.OodleLibraryName)] [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)] [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
 		public static partial long OodleLZ_GetDecodeBufferSize(OodleLZ_Compressor compressor, long size, [MarshalAs(UnmanagedType.I4)] bool corruptionPossible);
 
-		[LibraryImport(CompressionHelper.OodleLibraryName), DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories), UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		[LibraryImport(CompressionHelper.OodleLibraryName)] [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)] [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
 		public static unsafe partial long OodleLZ_GetCompressScratchMemBound(OodleLZ_Compressor compressor, OodleLZ_CompressionLevel level, long size, OodleLZ_CompressOptions* options);
 
-		[LibraryImport(CompressionHelper.OodleLibraryName), DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories), UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		[LibraryImport(CompressionHelper.OodleLibraryName)] [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)] [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
 		public static unsafe partial OodleLZ_CompressOptions* OodleLZ_CompressOptions_GetDefault(OodleLZ_Compressor compressor, OodleLZ_CompressionLevel level);
 	}
 }

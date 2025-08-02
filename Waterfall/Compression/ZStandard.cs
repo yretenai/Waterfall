@@ -197,11 +197,13 @@ public sealed partial class ZStandard : IDisposable {
 	}
 
 	private unsafe void FreeDict() {
-		if ((nint) DictPin.Pointer != nint.Zero) {
-			DictPin.Dispose();
-			DictPin = default;
-			Dict = Memory<byte>.Empty;
+		if ((nint) DictPin.Pointer == nint.Zero) {
+			return;
 		}
+
+		DictPin.Dispose();
+		DictPin = default;
+		Dict = Memory<byte>.Empty;
 	}
 
 	private void FreeContext() {
@@ -219,51 +221,49 @@ public sealed partial class ZStandard : IDisposable {
 		FreeDict();
 	}
 
-	~ZStandard() {
-		ReleaseUnmanagedResources();
-	}
+	~ZStandard() => ReleaseUnmanagedResources();
 
 	private static partial class NativeMethods {
-		[LibraryImport(CompressionHelper.ZstdLibraryName), DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories), UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		[LibraryImport(CompressionHelper.ZstdLibraryName)] [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)] [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
 		public static partial nint ZSTD_DCtx_setParameter(nint dctx, ZSTDDecompressionParameter param, int value);
 
-		[LibraryImport(CompressionHelper.ZstdLibraryName), DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories), UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		[LibraryImport(CompressionHelper.ZstdLibraryName)] [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)] [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
 		public static partial nint ZSTD_CCtx_setParameter(nint cctx, ZSTDCompressionParameter param, int value);
 
-		[LibraryImport(CompressionHelper.ZstdLibraryName), DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories), UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		[LibraryImport(CompressionHelper.ZstdLibraryName)] [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)] [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
 		public static partial nint ZSTD_DCtx_getParameter(nint dctx, ZSTDDecompressionParameter param, out int value);
 
-		[LibraryImport(CompressionHelper.ZstdLibraryName), DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories), UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		[LibraryImport(CompressionHelper.ZstdLibraryName)] [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)] [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
 		public static partial nint ZSTD_CCtx_getParameter(nint cctx, ZSTDCompressionParameter param, out int value);
 
-		[LibraryImport(CompressionHelper.ZstdLibraryName), DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories), UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		[LibraryImport(CompressionHelper.ZstdLibraryName)] [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)] [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
 		public static unsafe partial nint ZSTD_DCtx_loadDictionary_advanced(nint dctx, byte* dict, long dictSize, ZSTDDictLoadMethod loadMethod, ZSTDDictContentType contentType);
 
-		[LibraryImport(CompressionHelper.ZstdLibraryName), DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories), UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		[LibraryImport(CompressionHelper.ZstdLibraryName)] [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)] [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
 		public static unsafe partial nint ZSTD_CCtx_loadDictionary_advanced(nint cctx, byte* dict, long dictSize, ZSTDDictLoadMethod loadMethod, ZSTDDictContentType contentType);
 
-		[LibraryImport(CompressionHelper.ZstdLibraryName), DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories), UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		[LibraryImport(CompressionHelper.ZstdLibraryName)] [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)] [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
 		public static partial nint ZSTD_createDCtx();
 
-		[LibraryImport(CompressionHelper.ZstdLibraryName), DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories), UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		[LibraryImport(CompressionHelper.ZstdLibraryName)] [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)] [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
 		public static partial nint ZSTD_createCCtx();
 
-		[LibraryImport(CompressionHelper.ZstdLibraryName), DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories), UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		[LibraryImport(CompressionHelper.ZstdLibraryName)] [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)] [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
 		public static partial nint ZSTD_freeDCtx(nint dctx);
 
-		[LibraryImport(CompressionHelper.ZstdLibraryName), DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories), UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		[LibraryImport(CompressionHelper.ZstdLibraryName)] [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)] [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
 		public static partial nint ZSTD_freeCCtx(nint cctx);
 
-		[LibraryImport(CompressionHelper.ZstdLibraryName), DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories), UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		[LibraryImport(CompressionHelper.ZstdLibraryName)] [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)] [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
 		public static unsafe partial nint ZSTD_decompressDCtx(nint dctx, byte* dst, long dstCapacity, byte* src, long srcSize);
 
-		[LibraryImport(CompressionHelper.ZstdLibraryName), DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories), UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		[LibraryImport(CompressionHelper.ZstdLibraryName)] [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)] [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
 		public static unsafe partial nint ZSTD_compressCCtx(nint cctx, byte* dst, long dstCapacity, byte* src, long srcSize, ZSTDCompressionLevel compressionLevel);
 
-		[LibraryImport(CompressionHelper.ZstdLibraryName), DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories), UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		[LibraryImport(CompressionHelper.ZstdLibraryName)] [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)] [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
 		public static unsafe partial long ZSTD_decompressBound(byte* src, long srcSize);
 
-		[LibraryImport(CompressionHelper.ZstdLibraryName), DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories), UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		[LibraryImport(CompressionHelper.ZstdLibraryName)] [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)] [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
 		public static unsafe partial long ZSTD_compressBound(long size);
 	}
 }

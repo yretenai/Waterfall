@@ -14,9 +14,7 @@ public static class CompressionHelper {
 	internal const string ZstdLibraryName = "zstd";
 	internal const string DensityLibraryName = "density";
 
-	static CompressionHelper() {
-		NativeLibrary.SetDllImportResolver(Assembly.GetExecutingAssembly(), DllImportResolver);
-	}
+	static CompressionHelper() => NativeLibrary.SetDllImportResolver(Assembly.GetExecutingAssembly(), DllImportResolver);
 
 	public static bool EnableLogging { get; set; } = false;
 
@@ -42,11 +40,13 @@ public static class CompressionHelper {
 		foreach (var dir in new[] { Path.Combine(cwd, $"runtimes/{RuntimeInformation.RuntimeIdentifier}/native/"), cwd }) {
 			foreach (var libName in new[] { name, "lib" + name, name + "-0", $"lib{name}-0" }) {
 				var target = Path.Combine(dir, libName) + ext;
-				if (File.Exists(target)) {
-					var ptr = NativeLibrary.Load(target);
-					if (ptr != nint.Zero) {
-						return ptr;
-					}
+				if (!File.Exists(target)) {
+					continue;
+				}
+
+				var ptr = NativeLibrary.Load(target);
+				if (ptr != nint.Zero) {
+					return ptr;
 				}
 			}
 		}
@@ -56,28 +56,26 @@ public static class CompressionHelper {
 
 	internal static bool CanLoadLibrary(string libraryName) => NativeLibrary.TryLoad(libraryName, out _);
 
-	public static bool IsSupported(CompressionType compressionType) {
-		return compressionType switch {
-			       CompressionType.None => true,
-			       CompressionType.Oodle => CanLoadLibrary(OodleLibraryName),
-			       CompressionType.OodleTex => CanLoadLibrary(OodleTexLibraryName),
-			       CompressionType.Brotli => true,
-			       CompressionType.Zlib => true,
-			       CompressionType.Deflate => true,
-			       CompressionType.Gzip => true,
-			       CompressionType.LZ4 => true,
-			       CompressionType.LZ4HC => true,
-			       CompressionType.LZO1 => CanLoadLibrary(LzoLibraryName),
-			       CompressionType.LZO2 => CanLoadLibrary(LzoLibraryName),
-			       CompressionType.LZX => CanLoadLibrary(LzxLibraryName),
-			       CompressionType.LZMA => true,
-			       CompressionType.SafeLZMA => true,
-			       CompressionType.RawLZMA => true,
-			       CompressionType.Zstd => CanLoadLibrary(ZstdLibraryName),
-			       CompressionType.Density => CanLoadLibrary(DensityLibraryName),
-			       _ => false,
-		       };
-	}
+	public static bool IsSupported(CompressionType compressionType) =>
+		compressionType switch {
+			CompressionType.None => true,
+			CompressionType.Oodle => CanLoadLibrary(OodleLibraryName),
+			CompressionType.OodleTex => CanLoadLibrary(OodleTexLibraryName),
+			CompressionType.Brotli => true,
+			CompressionType.Zlib => true,
+			CompressionType.Deflate => true,
+			CompressionType.Gzip => true,
+			CompressionType.LZ4 => true,
+			CompressionType.LZ4HC => true,
+			CompressionType.LZO1 or CompressionType.LZO2 => CanLoadLibrary(LzoLibraryName),
+			CompressionType.LZX => CanLoadLibrary(LzxLibraryName),
+			CompressionType.LZMA => true,
+			CompressionType.SafeLZMA => true,
+			CompressionType.RawLZMA => true,
+			CompressionType.Zstd => CanLoadLibrary(ZstdLibraryName),
+			CompressionType.Density => CanLoadLibrary(DensityLibraryName),
+			_ => false,
+		};
 
 	public static unsafe int Decompress(CompressionType type, Memory<byte> compressed, Memory<byte> decompressed) {
 		switch (type) {
@@ -99,12 +97,7 @@ public static class CompressionHelper {
 			}
 			case CompressionType.Zstd: {
 				using var zstd = new ZStandard();
-				var n = zstd.Decompress(compressed, decompressed);
-				if (n < 0) {
-					throw new InvalidOperationException("decompression failed");
-				}
-
-				return n;
+				return zstd.Decompress(compressed, decompressed);
 			}
 			case CompressionType.Gzip: {
 				using var dataPin = compressed.Pin();
@@ -116,29 +109,14 @@ public static class CompressionHelper {
 				return decompressed.Length;
 			}
 			case CompressionType.Oodle: {
-				var n = Oodle.Decompress(compressed, decompressed);
-				if (n < 0) {
-					throw new InvalidOperationException("decompression failed");
-				}
-
-				return n;
+				return Oodle.Decompress(compressed, decompressed);
 			}
 			case CompressionType.OodleTex: {
-				var n = OodleTex.Decompress(compressed, decompressed);
-				if (n < 0) {
-					throw new InvalidOperationException("decompression failed");
-				}
-
-				return n;
+				return OodleTex.Decompress(compressed, decompressed);
 			}
 			case CompressionType.LZ4:
 			case CompressionType.LZ4HC: {
-				var n = LZ4Codec.Decode(compressed.Span, decompressed.Span);
-				if (n == -1) {
-					throw new InvalidOperationException("decompression failed");
-				}
-
-				return n;
+				return LZ4Codec.Decode(compressed.Span, decompressed.Span);
 			}
 			case CompressionType.Brotli: {
 				using var dataPin = compressed.Pin();
@@ -149,28 +127,13 @@ public static class CompressionHelper {
 				return decompressed.Length;
 			}
 			case CompressionType.LZO1: {
-				var n = LZO.DecompressLzo1(compressed, decompressed);
-				if (n < 0) {
-					throw new InvalidOperationException("decompression failed");
-				}
-
-				return n;
+				return LZO.DecompressLzo1(compressed, decompressed);
 			}
 			case CompressionType.LZO2: {
-				var n = LZO.DecompressLzo2(compressed, decompressed);
-				if (n < 0) {
-					throw new InvalidOperationException("decompression failed");
-				}
-
-				return n;
+				return LZO.DecompressLzo2(compressed, decompressed);
 			}
 			case CompressionType.LZX: {
-				var n = LZX.Decompress(compressed, decompressed, 17);
-				if (n < 0) {
-					throw new InvalidOperationException("decompression failed");
-				}
-
-				return n;
+				return LZX.Decompress(compressed, decompressed, 17);
 			}
 			case CompressionType.LZMA:
 			case CompressionType.SafeLZMA:
@@ -185,6 +148,7 @@ public static class CompressionHelper {
 					compressed[..5].CopyTo(array);
 					coder.SetDecoderProperties(array[..5]);
 					inStream.Position = 5;
+					// ReSharper disable once SwitchStatementMissingSomeEnumCasesNoDefault
 					switch (type) {
 						case CompressionType.LZMA:
 							inStream.Position += 16;
@@ -203,12 +167,7 @@ public static class CompressionHelper {
 				return (int) outStream.Length;
 			}
 			case CompressionType.Density: {
-				var n = Density.Decompress(compressed, decompressed);
-				if (n < 0) {
-					throw new InvalidOperationException("decompression failed");
-				}
-
-				return n;
+				return Density.Decompress(compressed, decompressed);
 			}
 			case CompressionType.None:
 				compressed.CopyTo(decompressed);
@@ -219,6 +178,7 @@ public static class CompressionHelper {
 	}
 
 	public static unsafe int Compress(CompressionType type, Memory<byte> compressed, Memory<byte> decompressed, CompressionLevel compressionLevel = CompressionLevel.Fastest) {
+		// ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
 		switch (type) {
 			case CompressionType.Zlib: {
 				using var dataPin = decompressed.Pin();
@@ -240,19 +200,14 @@ public static class CompressionHelper {
 			}
 			case CompressionType.Zstd: {
 				using var zstd = new ZStandard();
-				var n = (int) zstd.Compress(decompressed, compressed,
-				                            compressionLevel switch {
-					                            CompressionLevel.Optimal => ZSTDCompressionLevel.BTOptimal,
-					                            CompressionLevel.Fastest => ZSTDCompressionLevel.DecompressFast,
-					                            CompressionLevel.NoCompression => ZSTDCompressionLevel.None,
-					                            CompressionLevel.SmallestSize => ZSTDCompressionLevel.BTVeryUltra,
-					                            _ => throw new ArgumentOutOfRangeException(nameof(compressionLevel), compressionLevel, default),
-				                            });
-				if (n < 0) {
-					throw new InvalidOperationException("compression failed");
-				}
-
-				return n;
+				return (int) zstd.Compress(decompressed, compressed,
+					compressionLevel switch {
+						CompressionLevel.Optimal => ZSTDCompressionLevel.BTOptimal,
+						CompressionLevel.Fastest => ZSTDCompressionLevel.DecompressFast,
+						CompressionLevel.NoCompression => ZSTDCompressionLevel.None,
+						CompressionLevel.SmallestSize => ZSTDCompressionLevel.BTVeryUltra,
+						_ => throw new ArgumentOutOfRangeException(nameof(compressionLevel), compressionLevel, default),
+					});
 			}
 			case CompressionType.Gzip: {
 				using var dataPin = compressed.Pin();
@@ -265,28 +220,18 @@ public static class CompressionHelper {
 				return (int) zlib.Position;
 			}
 			case CompressionType.Oodle: {
-				var n = Oodle.Compress(decompressed, compressed, Oodle.OodleLZ_Compressor.Hydra,
-				                       compressionLevel switch {
-					                       CompressionLevel.Optimal => Oodle.OodleLZ_CompressionLevel.Optimal,
-					                       CompressionLevel.Fastest => Oodle.OodleLZ_CompressionLevel.Min,
-					                       CompressionLevel.NoCompression => Oodle.OodleLZ_CompressionLevel.None,
-					                       CompressionLevel.SmallestSize => Oodle.OodleLZ_CompressionLevel.Max,
-					                       _ => throw new ArgumentOutOfRangeException(nameof(compressionLevel), compressionLevel, default),
-				                       });
-				if (n < 0) {
-					throw new InvalidOperationException("compression failed");
-				}
-
-				return n;
+				return Oodle.Compress(decompressed, compressed, Oodle.OodleLZ_Compressor.Hydra,
+					compressionLevel switch {
+						CompressionLevel.Optimal => Oodle.OodleLZ_CompressionLevel.Optimal,
+						CompressionLevel.Fastest => Oodle.OodleLZ_CompressionLevel.Min,
+						CompressionLevel.NoCompression => Oodle.OodleLZ_CompressionLevel.None,
+						CompressionLevel.SmallestSize => Oodle.OodleLZ_CompressionLevel.Max,
+						_ => throw new ArgumentOutOfRangeException(nameof(compressionLevel), compressionLevel, default),
+					});
 			}
 			case CompressionType.LZ4:
 			case CompressionType.LZ4HC: {
-				var n = LZ4Codec.Encode(decompressed.Span, compressed.Span);
-				if (n == -1) {
-					throw new InvalidOperationException("compression failed");
-				}
-
-				return n;
+				return LZ4Codec.Encode(decompressed.Span, compressed.Span);
 			}
 			case CompressionType.Brotli: {
 				using var dataPin = compressed.Pin();

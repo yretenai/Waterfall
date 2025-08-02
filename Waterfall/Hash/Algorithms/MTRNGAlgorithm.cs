@@ -1,5 +1,4 @@
 using System.Numerics;
-using CS = System.Runtime.CompilerServices;
 
 namespace Waterfall.Hash.Algorithms;
 

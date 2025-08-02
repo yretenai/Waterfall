@@ -22,8 +22,8 @@ public static class MurmurHash3Algorithm {
 	}
 
 	public static uint Hash32_32(ReadOnlySpan<byte> key, uint seed = 0,
-	                             uint c1 = 0xcc9e2d51, uint c2 = 0x1b873593,
-	                             uint e = 0xe6546b64) {
+		uint c1 = 0xcc9e2d51, uint c2 = 0x1b873593,
+		uint e = 0xe6546b64) {
 		var h1 = seed;
 		uint k1;
 
@@ -61,8 +61,8 @@ public static class MurmurHash3Algorithm {
 	}
 
 	public static (uint, uint, uint, uint) Hash32_128(ReadOnlySpan<byte> key, uint seed = 0,
-	                                                  uint c1 = 0x239b961b, uint c2 = 0xab0e9789, uint c3 = 0x38b34ae5, uint c4 = 0xa8b34ae5,
-	                                                  uint e1 = 0x561ccd1b, uint e2 = 0x0bcaa747, uint e3 = 0x96cd1c35, uint e4 = 0x32ac3b17) {
+		uint c1 = 0x239b961b, uint c2 = 0xab0e9789, uint c3 = 0x38b34ae5, uint c4 = 0xa8b34ae5,
+		uint e1 = 0x561ccd1b, uint e2 = 0x0bcaa747, uint e3 = 0x96cd1c35, uint e4 = 0x32ac3b17) {
 		var h1 = seed;
 		var h2 = seed;
 		var h3 = seed;
@@ -218,8 +218,8 @@ public static class MurmurHash3Algorithm {
 	}
 
 	public static (ulong, ulong) Hash64_128(ReadOnlySpan<byte> key, ulong seed = 0,
-	                                        ulong c1 = 0x87c37b91114253d5, ulong c2 = 0x4cf5ad432745937f,
-	                                        ulong e1 = 0x52dce729, ulong e2 = 0x38495ab5) {
+		ulong c1 = 0x87c37b91114253d5, ulong c2 = 0x4cf5ad432745937f,
+		ulong e1 = 0x52dce729, ulong e2 = 0x38495ab5) {
 		var h1 = seed;
 		var h2 = seed;
 		ulong k1;

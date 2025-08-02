@@ -33,16 +33,16 @@ public sealed partial class LZO {
 	}
 
 	private static partial class NativeMethods {
-		[LibraryImport(CompressionHelper.LzoLibraryName), DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories), UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		[LibraryImport(CompressionHelper.LzoLibraryName)] [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)] [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
 		public static unsafe partial int __lzo_init_v2(uint version, int szShort, int szInt, int szLong, int szUint32, int szUint, int sDict, int szPtr, int szVoid, int szCb);
 
-		[LibraryImport(CompressionHelper.LzoLibraryName), DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories), UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		[LibraryImport(CompressionHelper.LzoLibraryName)] [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)] [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
 		public static unsafe partial uint lzo_version();
 
-		[LibraryImport(CompressionHelper.LzoLibraryName), DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories), UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		[LibraryImport(CompressionHelper.LzoLibraryName)] [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)] [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
 		public static unsafe partial int lzo1x_decompress_safe(byte* src, int srcLen, byte* dst, ref int dstLen, void* wrkmem);
 
-		[LibraryImport(CompressionHelper.LzoLibraryName), DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories), UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		[LibraryImport(CompressionHelper.LzoLibraryName)] [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)] [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
 		public static unsafe partial int lzo2a_decompress_safe(byte* src, int srcLen, byte* dst, ref int dstLen, void* wrkmem);
 	}
 }

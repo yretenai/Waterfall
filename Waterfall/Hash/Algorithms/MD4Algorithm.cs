@@ -8,9 +8,7 @@ public class MD4Algorithm : HashAlgorithm {
 	private StateStack Stack { get; set; } = new(0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476);
 	private uint Length { get; set; }
 
-	protected override void HashCore(byte[] array, int ibStart, int cbSize) {
-		HashCore(array.AsSpan(ibStart, cbSize));
-	}
+	protected override void HashCore(byte[] array, int ibStart, int cbSize) => HashCore(array.AsSpan(ibStart, cbSize));
 
 	public void HashCore(Span<byte> array) {
 		var block = Block;
@@ -62,9 +60,7 @@ public class MD4Algorithm : HashAlgorithm {
 		Reset();
 	}
 
-	public void Reset() {
-		Initialize();
-	}
+	public void Reset() => Initialize();
 
 	public override void Initialize() {
 		Block = new BlockStack();
@@ -142,12 +138,12 @@ public class MD4Algorithm : HashAlgorithm {
 	[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
 	private static uint H(uint x, uint y, uint z) => x ^ y ^ z;
 
-	[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 4), InlineArray(16)]
+	[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 4)] [InlineArray(16)]
 	private struct BlockStack {
 		public uint Value;
 	}
 
-	[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 4), InlineArray(4)]
+	[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 4)] [InlineArray(4)]
 	private struct StateStack {
 		public uint Value;
 
