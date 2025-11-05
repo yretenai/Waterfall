@@ -153,6 +153,10 @@ public sealed partial class ZStandard : IDisposable {
 
 	public IMemoryOwner<byte>? Decompress(Memory<byte> input, MemoryPool<byte>? pool = default) {
 		var size = GetDecompressBound(input);
+		if (size <= 0) {
+			return null;
+		}
+
 		var output = (pool ?? MemoryPool<byte>.Shared).Rent(size);
 		if (Decompress(input, output.Memory[..size]) != -1) {
 			return output;
