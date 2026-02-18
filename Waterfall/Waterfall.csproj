@@ -8,43 +8,22 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Update="runtimes\win-x64\native\libdensity.dll">
+		<None Update="runtimes\win-x64\native\*.dll">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="runtimes\win-x64\native\libchm.dll">
+		<None Update="runtimes\win-x32\native\*.dll">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="runtimes\win-x64\native\liblzo2.dll">
+		<None Update="runtimes\win-arm64\native\*.dll">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="runtimes\win-arm64\native\libzstd.dll">
+		<None Update="runtimes\osx\native\*.dylib">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="runtimes\win-x32\native\libzstd.dll">
+		<None Update="runtimes\linux-x64\native\*.so">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="runtimes\win-x64\native\libzstd.dll">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Update="runtimes\linux-x64\native\liboo2core.so">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Update="runtimes\win-x64\native\oo2core.dll">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Update="runtimes\win-x32\native\oo2core.dll">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Update="runtimes\win-arm64\native\oo2core.dll">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Update="runtimes\osx\native\liboo2core.dylib">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Update="runtimes\linux-arm64\native\liboo2core.so">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Update="runtimes\linux-arm32\native\liboo2core.so">
+		<None Update="runtimes\linux-arm64\native\*.so">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
