@@ -8,22 +8,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Update="runtimes\win-x64\native\*.dll">
+		<None Update="runtimes\**\*.dll">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="runtimes\win-x32\native\*.dll">
+		<None Update="runtimes\**\*.so">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="runtimes\win-arm64\native\*.dll">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Update="runtimes\osx\native\*.dylib">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Update="runtimes\linux-x64\native\*.so">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Update="runtimes\linux-arm64\native\*.so">
+		<None Update="runtimes\**\*.dylib">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
