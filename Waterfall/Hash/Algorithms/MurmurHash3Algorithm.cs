@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: 0BSD
 
 using System.Numerics;
+using System.Text;
 
 namespace Waterfall.Hash.Algorithms;
 
@@ -25,13 +26,59 @@ public static class MurmurHash3Algorithm {
 		return h;
 	}
 
-	public static uint Hash32_32(ReadOnlySpan<byte> key, uint seed = 0,
-		uint c1 = 0xcc9e2d51, uint c2 = 0x1b873593,
-		uint e = 0xe6546b64) {
+	public static uint Hash32_32(string text, Encoding? encoding = null, uint seed = 0, uint c1 = 0xcc9e2d51, uint c2 = 0x1b873593, uint e = 0xe6546b64) {
+		var rented = default(byte[]?);
+		encoding ??= Text.UTF8NoBOM;
+		var length = encoding.GetByteCount(text);
+		var buffer = length < 1024 ? stackalloc byte[length] : rented = ArrayPool<byte>.Shared.Rent(length);
+
+		try {
+			var n = encoding.GetBytes(text, buffer);
+			return Hash32_32(buffer[..n], seed, c1, c2, e);
+		} finally {
+			if (rented != null) {
+				ArrayPool<byte>.Shared.Return(rented);
+			}
+		}
+	}
+
+	public static (uint, uint, uint, uint) Hash32_128(string text, Encoding? encoding = null, uint seed = 0, uint c1 = 0x239b961b, uint c2 = 0xab0e9789, uint c3 = 0x38b34ae5, uint c4 = 0xa8b34ae5, uint e1 = 0x561ccd1b, uint e2 = 0x0bcaa747, uint e3 = 0x96cd1c35, uint e4 = 0x32ac3b17) {
+		var rented = default(byte[]?);
+		encoding ??= Text.UTF8NoBOM;
+		var length = encoding.GetByteCount(text);
+		var buffer = length < 1024 ? stackalloc byte[length] : rented = ArrayPool<byte>.Shared.Rent(length);
+
+		try {
+			var n = encoding.GetBytes(text, buffer);
+			return Hash32_128(buffer[..n], seed, c1, c2, c3, c4, e1, e2, e3, e4);
+		} finally {
+			if (rented != null) {
+				ArrayPool<byte>.Shared.Return(rented);
+			}
+		}
+	}
+
+	public static (ulong, ulong) Hash64_128(string text, Encoding? encoding = null, ulong seed = 0, ulong c1 = 0x87c37b91114253d5, ulong c2 = 0x4cf5ad432745937f, ulong e1 = 0x52dce729, ulong e2 = 0x38495ab5) {
+		var rented = default(byte[]?);
+		encoding ??= Text.UTF8NoBOM;
+		var length = encoding.GetByteCount(text);
+		var buffer = length < 1024 ? stackalloc byte[length] : rented = ArrayPool<byte>.Shared.Rent(length);
+
+		try {
+			var n = encoding.GetBytes(text, buffer);
+			return Hash64_128(buffer[..n], seed, c1, c2, e1, e2);
+		} finally {
+			if (rented != null) {
+				ArrayPool<byte>.Shared.Return(rented);
+			}
+		}
+	}
+
+	public static uint Hash32_32(ReadOnlySpan<byte> text, uint seed = 0, uint c1 = 0xcc9e2d51, uint c2 = 0x1b873593, uint e = 0xe6546b64) {
 		var h1 = seed;
 		uint k1;
 
-		var blocks = MemoryMarshal.Cast<byte, uint>(key);
+		var blocks = MemoryMarshal.Cast<byte, uint>(text);
 		foreach (var block in blocks) {
 			k1 = block * c1;
 			k1 = BitOperations.RotateLeft(k1, 15);
@@ -44,7 +91,7 @@ public static class MurmurHash3Algorithm {
 
 		k1 = 0u;
 
-		var tail = key[(blocks.Length << 2)..];
+		var tail = text[(blocks.Length << 2)..];
 		switch (tail.Length) {
 			case 3:
 				k1 ^= (uint) tail[2] << 16;
@@ -61,12 +108,10 @@ public static class MurmurHash3Algorithm {
 				break;
 		}
 
-		return FMix32(h1 ^ (uint) key.Length);
+		return FMix32(h1 ^ (uint) text.Length);
 	}
 
-	public static (uint, uint, uint, uint) Hash32_128(ReadOnlySpan<byte> key, uint seed = 0,
-		uint c1 = 0x239b961b, uint c2 = 0xab0e9789, uint c3 = 0x38b34ae5, uint c4 = 0xa8b34ae5,
-		uint e1 = 0x561ccd1b, uint e2 = 0x0bcaa747, uint e3 = 0x96cd1c35, uint e4 = 0x32ac3b17) {
+	public static (uint, uint, uint, uint) Hash32_128(ReadOnlySpan<byte> text, uint seed = 0, uint c1 = 0x239b961b, uint c2 = 0xab0e9789, uint c3 = 0x38b34ae5, uint c4 = 0xa8b34ae5, uint e1 = 0x561ccd1b, uint e2 = 0x0bcaa747, uint e3 = 0x96cd1c35, uint e4 = 0x32ac3b17) {
 		var h1 = seed;
 		var h2 = seed;
 		var h3 = seed;
@@ -76,7 +121,7 @@ public static class MurmurHash3Algorithm {
 		uint k3;
 		uint k4;
 
-		var blocks = MemoryMarshal.Cast<byte, uint>(key);
+		var blocks = MemoryMarshal.Cast<byte, uint>(text);
 		for (var index = 0; index < blocks.Length; index += 4) {
 			k1 = blocks[index];
 			k2 = blocks[index + 1];
@@ -125,7 +170,7 @@ public static class MurmurHash3Algorithm {
 		k3 = 0u;
 		k4 = 0u;
 
-		var tail = key[(blocks.Length << 4)..];
+		var tail = text[(blocks.Length << 4)..];
 		switch (tail.Length) {
 			case 15:
 				k4 ^= (uint) tail[14] << 16;
@@ -193,7 +238,7 @@ public static class MurmurHash3Algorithm {
 				break;
 		}
 
-		var len = (uint) key.Length;
+		var len = (uint) text.Length;
 		h1 ^= len;
 		h2 ^= len;
 		h3 ^= len;
@@ -221,15 +266,13 @@ public static class MurmurHash3Algorithm {
 		return (h1, h2, h3, h4);
 	}
 
-	public static (ulong, ulong) Hash64_128(ReadOnlySpan<byte> key, ulong seed = 0,
-		ulong c1 = 0x87c37b91114253d5, ulong c2 = 0x4cf5ad432745937f,
-		ulong e1 = 0x52dce729, ulong e2 = 0x38495ab5) {
+	public static (ulong, ulong) Hash64_128(ReadOnlySpan<byte> text, ulong seed = 0, ulong c1 = 0x87c37b91114253d5, ulong c2 = 0x4cf5ad432745937f, ulong e1 = 0x52dce729, ulong e2 = 0x38495ab5) {
 		var h1 = seed;
 		var h2 = seed;
 		ulong k1;
 		ulong k2;
 
-		var blocks = MemoryMarshal.Cast<byte, ulong>(key);
+		var blocks = MemoryMarshal.Cast<byte, ulong>(text);
 		for (var index = 0; index < blocks.Length; index += 2) {
 			k1 = blocks[index];
 			k2 = blocks[index + 1];
@@ -256,7 +299,7 @@ public static class MurmurHash3Algorithm {
 		k1 = 0;
 		k2 = 0;
 
-		var tail = key[(blocks.Length << 4)..];
+		var tail = text[(blocks.Length << 4)..];
 		switch (tail.Length) {
 			case 15:
 				k2 ^= (ulong) tail[14] << 48;
@@ -314,7 +357,7 @@ public static class MurmurHash3Algorithm {
 				break;
 		}
 
-		var len = (uint) key.Length;
+		var len = (uint) text.Length;
 		h1 ^= len;
 		h2 ^= len;
 
