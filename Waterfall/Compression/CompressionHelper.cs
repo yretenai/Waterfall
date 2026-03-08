@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023-2026 Neptuwunium
+//
+// SPDX-License-Identifier: 0BSD
+
 using System.IO;
 using System.IO.Compression;
 using K4os.Compression.LZ4;

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023-2026 Neptuwunium
+//
+// SPDX-License-Identifier: 0BSD
+
 namespace Waterfall.Hash.Basis;
 
 public record struct CRCVariant<T>(T Polynomial, T Init, T Xor, bool ReflectIn, bool ReflectOut);

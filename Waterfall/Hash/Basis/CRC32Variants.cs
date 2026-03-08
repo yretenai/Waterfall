@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023-2026 Neptuwunium
+//
+// SPDX-License-Identifier: 0BSD
+
 namespace Waterfall.Hash.Basis;
 
 // https://reveng.sourceforge.io/crc-catalogue/all.htm

@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2023-2026 Neptuwunium
+
+SPDX-License-Identifier: 0BSD
+-->
+
 # Waterfall
 
 Wrappers around Native compression methods.

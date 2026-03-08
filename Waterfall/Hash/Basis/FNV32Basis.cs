@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023-2026 Neptuwunium
+//
+// SPDX-License-Identifier: 0BSD
+
 namespace Waterfall.Hash.Basis;
 
 // https://tools.ietf.org/html/draft-eastlake-fnv-17

@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2023-2026 Neptuwunium
+
+SPDX-License-Identifier: 0BSD
+-->
+
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
@@ -25,9 +31,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Content Include="runtimes\**\*">
+		<None Update="runtimes\**\*.dll">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
+		</None>
+		<None Update="runtimes\**\*.so">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="runtimes\**\*.dylib">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 
 </Project>
