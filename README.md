@@ -8,6 +8,7 @@ SPDX-License-Identifier: EUPL-1.2
 
 Wrappers around Native compression methods.
 
+## Moved to https://github.com/neptuwunium/Neptune/tree/develop/Charon
 
 - Windows: LZO, and Oodle have to be provided manually.
 - Linux: Your distro package manager will have almost all dependencies (`apt install libchm1 lzo2 zstd`, `portage emerge dev-libs/chmlib dev-libs/lzo app-arch/zstd`, etc)
